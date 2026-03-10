@@ -1,0 +1,5 @@
+{
+  "name": "WatchOut: AI Medical Misinformation Detection",
+  "description": "An AI-powered platform for detecting and mitigating medical misinformation and digital healthcare threats.",
+  "requestFramePermissions": ["camera"]
+}
