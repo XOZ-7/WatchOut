@@ -8,12 +8,13 @@ function cn(...inputs: ClassValue[]) {
 }
 
 interface SidebarProps {
-  activeTab: 'dashboard' | 'chatbot' | 'reports';
-  setActiveTab: (tab: 'dashboard' | 'chatbot' | 'reports') => void;
+  activeTab: 'analyzer'|'dashboard' | 'chatbot' | 'reports';
+  setActiveTab: (tab: 'analyzer'|'dashboard' | 'chatbot' | 'reports') => void;
 }
 
 export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const menuItems = [
+    { id: 'analyzer', label: 'Data Analyzer', icon: LayoutDashboard },
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'chatbot', label: 'AI Chatbot', icon: MessageSquare },
     { id: 'reports', label: 'Analysis Reports', icon: ShieldAlert },
