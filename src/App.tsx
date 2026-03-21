@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import Chatbot from './components/Chatbot';
+import Analyzer from './components/Analyzer';
 import { ShieldAlert, Info } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'chatbot' | 'reports'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'analyzer'|'dashboard' | 'chatbot' | 'reports'>('dashboard');
 
   return (
     <div className="flex h-screen bg-[#0a0a0a] overflow-hidden font-sans selection:bg-emerald-500/30 selection:text-emerald-200">
@@ -14,6 +15,7 @@ export default function App() {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col relative overflow-hidden">
+        {activeTab === 'analyzer' && <Analyzer />}
         {activeTab === 'dashboard' && <Dashboard />}
         {activeTab === 'chatbot' && <Chatbot />}
         {activeTab === 'reports' && (
@@ -54,3 +56,4 @@ export default function App() {
     </div>
   );
 }
+
