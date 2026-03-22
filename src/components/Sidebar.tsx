@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, MessageSquare, ShieldAlert, Settings, LogOut, Activity } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, ShieldAlert, Settings, LogOut, Activity, ChartBar, ChartBarIcon, ChartColumn, ClipboardCheck } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -8,14 +8,15 @@ function cn(...inputs: ClassValue[]) {
 }
 
 interface SidebarProps {
-  activeTab: 'analyzer'|'dashboard' | 'chatbot' | 'reports';
-  setActiveTab: (tab: 'analyzer'|'dashboard' | 'chatbot' | 'reports') => void;
+  activeTab: 'dashboard_1' | 'analyzer'|'dashboard' | 'chatbot' | 'reports';
+  setActiveTab: (tab: 'dashboard_1' | 'analyzer'|'dashboard' | 'chatbot' | 'reports') => void;
 }
 
 export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const menuItems = [
-    { id: 'analyzer', label: 'Data Analyzer', icon: LayoutDashboard },
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'dashboard', label: 'System Dashboard', icon: LayoutDashboard },
+    { id: 'dashboard_1', label: 'Visualization', icon: ChartColumn },
+    { id: 'analyzer', label: 'Data Analyzer', icon: ClipboardCheck },
     { id: 'chatbot', label: 'AI Chatbot', icon: MessageSquare },
     { id: 'reports', label: 'Analysis Reports', icon: ShieldAlert },
   ];
@@ -70,3 +71,4 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     </div>
   );
 }
+
