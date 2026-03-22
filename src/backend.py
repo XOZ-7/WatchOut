@@ -10,6 +10,8 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 import pickle
 from fastapi.middleware.cors import CORSMiddleware
 
+device = torch.device("cpu")
+
 app = FastAPI()
 
 app.add_middleware(
@@ -24,7 +26,11 @@ app.add_middleware(
 
 # BioBERT
 tokenizer = BertTokenizer.from_pretrained("biobert_fact_model")
-bert_model = BertForSequenceClassification.from_pretrained("biobert_fact_model")
+bert_model = BertForSequenceClassification.from_pretrained(
+    "./biobert_fact_model",
+    torch_dtype="auto",
+    low_cpu_mem_usage=True
+)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 bert_model.to(device)
