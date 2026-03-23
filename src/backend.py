@@ -3,10 +3,10 @@ from pydantic import BaseModel
 
 import torch
 import torch.nn.functional as F
-import tensorflow as tf
 
+from transformers import pipeline
 from transformers import BertTokenizer, BertForSequenceClassification
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+
 import pickle
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -35,14 +35,10 @@ bert_model = BertForSequenceClassification.from_pretrained(
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 bert_model.to(device)
 
-# RNN
-rnn_model = tf.keras.models.load_model("tone_model.h5")
-
-# ⚠️ IMPORTANT: Load tokenizer used during training
-with open("tokenizer_rnn.pkl", "rb") as f:
-    tokenizer_rnn = pickle.load(f)
-
-tone_labels = ["negative","neutral","positive"]
+tone_model = pipeline(
+    "sentiment-analysis",
+    model="distilbert-base-uncased-finetuned-sst-2-english"
+)
 
 # ---------------- REQUEST FORMAT ---------------- #
 
@@ -61,22 +57,24 @@ def check_claim(claim):
     pred = torch.argmax(probs).item()
     confidence = probs[0][pred].item()
 
-    result = "VALID" if pred == 0 else "INVALID"
+    result = "Valid" if pred == 0 else "Invalid"
     return result, confidence
 
 
 def detect_tone(text):
-    seq = tokenizer_rnn.texts_to_sequences([text])
-    padded = pad_sequences(seq, maxlen=100)
+    result = tone_model(text)[0]
 
-    pred = rnn_model.predict(padded)
-    tone_index = pred.argmax()
+    label = result["label"]
+    confidence = result["score"]
 
-    return tone_labels[tone_index], float(pred[0][tone_index])
+    if label == "POSITIVE":
+        tone = "Positive"
+    else:
+        tone = "Negative"
 
+    return tone, confidence
 
 # ---------------- API ---------------- #
-
 @app.post("/analyze")
 def analyze(data: Query):
     claim = data.query
@@ -88,5 +86,5 @@ def analyze(data: Query):
         "biobert": validity,
         "confidence": confidence,
         "tone": tone,
-        #"tone_confidence": tone_conf
+    #    "tone_confidence": tone_conf
     }
