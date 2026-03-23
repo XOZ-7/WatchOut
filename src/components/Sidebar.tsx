@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, MessageSquare, ShieldAlert, Settings, LogOut, Activity, ChartBar, ChartBarIcon, ChartColumn, ClipboardCheck } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, ShieldAlert, Settings, LogOut, Activity, ChartBar, ChartBarIcon, ChartColumn, ClipboardCheck, Brain } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -15,10 +15,10 @@ interface SidebarProps {
 export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const menuItems = [
     { id: 'dashboard', label: 'System Dashboard', icon: LayoutDashboard },
-    { id: 'dashboard_1', label: 'Visualization', icon: ChartColumn },
-    { id: 'analyzer', label: 'Data Analyzer', icon: ClipboardCheck },
+    { id: 'dashboard_1', label: 'Analytics Dashboard', icon: ChartColumn },
+    { id: 'analyzer', label: 'Data Analyzer', icon: Brain },
+    { id: 'reports', label: 'Reports', icon: ClipboardCheck },
     { id: 'chatbot', label: 'AI Chatbot', icon: MessageSquare },
-    { id: 'reports', label: 'Analysis Reports', icon: ShieldAlert },
   ];
 
   return (
@@ -71,4 +71,3 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     </div>
   );
 }
-
