@@ -55,7 +55,7 @@ export default function QueryAnalyzer() {
 
   return (
     <div className="p-6 text-white">
-      <h2 className="text-xl font-semibold mb-4">Query Analyzer</h2>
+      <h2 className="text-xl font-semibold mb-4">Data Analyzer</h2>
 
       <textarea
         value={query}
@@ -74,9 +74,9 @@ export default function QueryAnalyzer() {
 
       {result && (
             <div>
+                <p><strong>Tone:</strong> {result.tone}</p>
                 <p><strong>Validity:</strong> {result.biobert}</p>
                 <p><strong>Confidence:</strong> {result.confidence}</p>
-                <p><strong>Tone:</strong> {result.tone}</p>
                 
             </div>
     )}
