@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, MessageSquare, ShieldAlert, Settings, LogOut, Activity, ChartBar, ChartBarIcon, ChartColumn, ClipboardCheck, Brain } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, ShieldAlert, Settings, LogOut, Activity, ChartBar, ChartBarIcon, ChartColumn, ClipboardCheck, Brain, Book } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -17,8 +17,8 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     { id: 'dashboard', label: 'System Dashboard', icon: LayoutDashboard },
     { id: 'dashboard_1', label: 'Analytics Dashboard', icon: ChartColumn },
     { id: 'analyzer', label: 'Data Analyzer', icon: Brain },
-    { id: 'reports', label: 'Reports', icon: ClipboardCheck },
-    { id: 'chatbot', label: 'AI Chatbot', icon: MessageSquare },
+    { id: 'reports', label: 'Histroy', icon: Book },
+    
   ];
 
   return (
@@ -59,10 +59,7 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       </nav>
 
       <div className="p-4 border-t border-white/10 space-y-2">
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/50 hover:bg-white/5 hover:text-white transition-all duration-200">
-          <Settings className="w-5 h-5" />
-          <span className="font-medium text-sm">Settings</span>
-        </button>
+        
         <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400/70 hover:bg-red-400/10 hover:text-red-400 transition-all duration-200">
           <LogOut className="w-5 h-5" />
           <span className="font-medium text-sm">Logout</span>
