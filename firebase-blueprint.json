@@ -1,0 +1,49 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile data",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique user ID" },
+        "email": { "type": "string", "format": "email", "description": "User's email address" },
+        "displayName": { "type": "string", "description": "User's display name" },
+        "photoURL": { "type": "string", "description": "User's profile picture URL" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account creation timestamp" }
+      },
+      "required": ["uid", "email"]
+    },
+    "AnalysisQuery": {
+      "title": "AnalysisQuery",
+      "description": "A query sent to the Data Analyser",
+      "type": "object",
+      "properties": {
+        "query": { "type": "string", "description": "The input query string" },
+        "result": { "type": "string", "description": "The verification result" },
+        "confidence": { "type": "number", "description": "Confidence score (0-100)" },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the analysis was performed" },
+        "sources": { 
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "url": { "type": "string" }
+            }
+          }
+        }
+      },
+      "required": ["query", "result", "confidence", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile documents"
+    },
+    "/users/{userId}/analysis_queries/{queryId}": {
+      "schema": "AnalysisQuery",
+      "description": "Analysis history for a specific user"
+    }
+  }
+}
