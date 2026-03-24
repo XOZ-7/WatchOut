@@ -10,6 +10,13 @@ from transformers import BertTokenizer, BertForSequenceClassification
 import pickle
 from fastapi.middleware.cors import CORSMiddleware
 
+from google import genai
+import json, re
+
+model="gemini-1.5-flash-latest"
+client = genai.Client(api_key="AIzaSyCL2qCibeeCKkmFhsDgON1YGm8PS6hOgxA")
+
+
 device = torch.device("cpu")
 
 app = FastAPI()
@@ -74,6 +81,7 @@ def detect_tone(text):
 
     return tone, confidence
 
+
 # ---------------- API ---------------- #
 @app.post("/analyze")
 def analyze(data: Query):
@@ -88,3 +96,48 @@ def analyze(data: Query):
         "tone": tone,
     #    "tone_confidence": tone_conf
     }
+
+@app.post("/explain")
+def explain(data: Query):
+    claim = data.query
+
+    prompt = f"""
+    You are a medical fact-checking assistant.
+
+    Analyze the claim:
+    "{claim}"
+
+    Provide:
+    1. A clear explanation (2–4 sentences)
+    2. Say if it's valid or misinformation
+    3. Give 2 reliable sources (WHO, CDC, etc.)
+
+    Return ONLY JSON:
+    {{
+        "reasoning": "...",
+        "sources": [
+            {{"title": "...", "url": "..."}},
+            {{"title": "...", "url": "..."}}
+        ]
+    }}
+    """
+
+    response = client.models.generate_content(
+        model="gemini-1.5-flash",  # ✅ NOW this works
+        contents=prompt,
+    )
+
+    import json, re
+
+    text = response.text
+
+    try:
+        cleaned = re.sub(r"```json|```", "", text).strip()
+        result = json.loads(cleaned)
+    except:
+        result = {
+            "reasoning": text,
+            "sources": []
+        }
+
+    return result
