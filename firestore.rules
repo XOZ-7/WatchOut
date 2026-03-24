@@ -1,0 +1,110 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: userId (auth.uid)
+    // Fields:
+    //   - uid: string (required, immutable) - Unique user ID
+    //   - email: string (required, format: email, immutable) - User's email
+    //   - displayName: string (optional) - User's display name
+    //   - photoURL: string (optional) - User's profile picture URL
+    //   - createdAt: timestamp (required, immutable) - Account creation time
+    //
+    // Collection: users/{userId}/analysis_queries
+    // Document ID: queryId (auto-generated)
+    // Fields:
+    //   - query: string (required, size < 1000) - Input query
+    //   - result: string (required, size < 5000) - Verification result
+    //   - confidence: number (required, 0-100) - Confidence score
+    //   - timestamp: timestamp (required, immutable) - When performed
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "snksnk7x3cho@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidTimestamp(field) {
+      return request.resource.data[field] is timestamp;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidUser(data) {
+      return hasRequiredFields(['uid', 'email', 'createdAt']) &&
+             hasOnlyAllowedFields(['uid', 'email', 'displayName', 'photoURL', 'createdAt', 'role']) &&
+             data.uid == request.auth.uid &&
+             isValidEmail(data.email) &&
+             data.createdAt is timestamp &&
+             (!('role' in data) || data.role == 'user' || isAdmin());
+    }
+
+    function isValidAnalysisQuery(data) {
+      return hasRequiredFields(['query', 'result', 'confidence', 'timestamp']) &&
+             hasOnlyAllowedFields(['query', 'result', 'confidence', 'timestamp', 'sources']) &&
+             data.query is string && data.query.size() < 1000 &&
+             data.result is string && data.result.size() < 5000 &&
+             data.confidence is number && data.confidence >= 0 && data.confidence <= 100 &&
+             data.timestamp is timestamp &&
+             (!('sources' in data) || data.sources is list);
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) &&
+                      request.resource.data.uid == resource.data.uid &&
+                      request.resource.data.email == resource.data.email &&
+                      request.resource.data.createdAt == resource.data.createdAt &&
+                      (request.resource.data.role == resource.data.role || isAdmin());
+
+      match /analysis_queries/{queryId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isValidAnalysisQuery(request.resource.data);
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // Default deny
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}
