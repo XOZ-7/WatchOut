@@ -1,24 +1,25 @@
 import React from 'react';
-import { LayoutDashboard, MessageSquare, ShieldAlert, Settings, LogOut, Activity, ChartBar, ChartBarIcon, ChartColumn, ClipboardCheck, Brain } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, ShieldAlert, History, LogOut, Activity, User as UserIcon } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { FirebaseUser } from '../firebase';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 interface SidebarProps {
-  activeTab: 'dashboard_1' | 'analyzer'|'dashboard' | 'chatbot' | 'reports';
-  setActiveTab: (tab: 'dashboard_1' | 'analyzer'|'dashboard' | 'chatbot' | 'reports') => void;
+  activeTab: 'dashboard' | 'reports' | 'history' | 'analyser';
+  setActiveTab: (tab: 'dashboard' | 'reports' | 'history' | 'analyser') => void;
+  onLogout: () => void;
+  user?: FirebaseUser | null;
 }
 
-export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
+export default function Sidebar({ activeTab, setActiveTab, onLogout, user }: SidebarProps) {
   const menuItems = [
-    { id: 'dashboard', label: 'System Dashboard', icon: LayoutDashboard },
-    { id: 'dashboard_1', label: 'Analytics Dashboard', icon: ChartColumn },
-    { id: 'analyzer', label: 'Data Analyzer', icon: Brain },
-    { id: 'reports', label: 'Reports', icon: ClipboardCheck },
-    { id: 'chatbot', label: 'AI Chatbot', icon: MessageSquare },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'analyser', label: 'Data Analyser', icon: Activity },
+    { id: 'reports', label: 'Analysis Reports', icon: ShieldAlert },
   ];
 
   return (
@@ -59,11 +60,35 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       </nav>
 
       <div className="p-4 border-t border-white/10 space-y-2">
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/50 hover:bg-white/5 hover:text-white transition-all duration-200">
-          <Settings className="w-5 h-5" />
-          <span className="font-medium text-sm">Settings</span>
+        {user && (
+          <div className="px-4 py-4 mb-2 bg-white/5 border border-white/10 rounded-2xl flex items-center gap-3">
+            {user.photoURL ? (
+              <img src={user.photoURL} alt={user.displayName || 'User'} className="w-8 h-8 rounded-full border border-emerald-500/20" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                <UserIcon className="w-4 h-4 text-emerald-400" />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-white truncate">{user.displayName || 'Guest User'}</p>
+              <p className="text-[10px] text-white/40 truncate">{user.email}</p>
+            </div>
+          </div>
+        )}
+        <button 
+          onClick={() => setActiveTab('history')}
+          className={cn(
+            "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+            activeTab === 'history' ? "bg-white/10 text-white" : "text-white/50 hover:bg-white/5 hover:text-white"
+          )}
+        >
+          <History className="w-5 h-5" />
+          <span className="font-medium text-sm">Analysis History</span>
         </button>
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400/70 hover:bg-red-400/10 hover:text-red-400 transition-all duration-200">
+        <button 
+          onClick={onLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400/70 hover:bg-red-400/10 hover:text-red-400 transition-all duration-200"
+        >
           <LogOut className="w-5 h-5" />
           <span className="font-medium text-sm">Logout</span>
         </button>
@@ -71,3 +96,4 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     </div>
   );
 }
+
